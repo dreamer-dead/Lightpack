@@ -26,8 +26,18 @@
 #include "WinAPIGrabberEachWidget.hpp"
 
 #ifdef WINAPI_GRAB_SUPPORT
+//#include "PrismatikMath.hpp"
 #include "../src/debug.h"
 #include <cmath>
+
+//using PrismatikMath::round;
+
+#if defined _MSC_VER
+static double round(double number)
+{
+    return number < 0.0 ? std::ceil(number - 0.5) : std::floor(number + 0.5);
+}
+#endif // _MSC_VER
 
 WinAPIGrabberEachWidget::WinAPIGrabberEachWidget(QObject * parent, QList<QRgb> *grabResult, QList<GrabWidget *> *grabAreasGeometry)
     : TimeredGrabber(parent, grabResult, grabAreasGeometry)

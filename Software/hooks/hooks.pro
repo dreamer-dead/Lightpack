@@ -17,9 +17,9 @@ INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
 
 
 QMAKE_CXXFLAGS = -std=c++11
-LIBS += -lwsock32 -lshlwapi -ladvapi32 -L"$${DIRECTX_SDK_DIR}/Lib/x86" -ldxguid #-LD:/System/Users/Tim/Projects/Lightpack/Software/zeromq -lzmq.dll
+LIBS += -lwsock32 -lshlwapi -ladvapi32 -luser32 -L"$${DIRECTX_SDK_DIR}/Lib/x86" -ldxguid #-LD:/System/Users/Tim/Projects/Lightpack/Software/zeromq -lzmq.dll
 QMAKE_LFLAGS += -static
-QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
+#QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
 QMAKE_LFLAGS_EXCEPTIONS_ON -= -mthreads
 QMAKE_CXXFLAGS_EXCEPTIONS_ON -= -mthreads
 

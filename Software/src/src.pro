@@ -7,7 +7,8 @@
 # -------------------------------------------------
 
 TARGET      = Prismatik
-PRE_TARGETDEPS += ../lib/libgrab.a
+#PRE_TARGETDEPS += ../lib/libgrab.a
+PRE_TARGETDEPS += ../lib/grab.lib
 DESTDIR     = bin
 TEMPLATE    = app
 QT         += network widgets
@@ -67,7 +68,8 @@ unix:!macx{
 
 win32 {
     # Windows version using WinAPI for HID
-    LIBS    += -lhid -lusbcamd -lsetupapi
+    #LIBS    += -lhid -lusbcamd -lsetupapi
+    LIBS    += -lsetupapi
     # For QSerialDevice
     LIBS    += -luuid -ladvapi32
 
@@ -95,10 +97,11 @@ win32 {
                 cp -f \"$${QTDIR}/bin/Qt5Network$${DEBUG_EXT}.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/icudt51.dll\" ./ && \
                 cp -f \"$${QTDIR}/bin/icuin51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libwinpthread-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libgcc_s_dw2-1.dll\" ./ && \
-                cp -f \"$${QTDIR}/bin/libstdc++-6.dll\" ./
+                cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./
+                #cp -f \"$${QTDIR}/bin/icuuc51.dll\" ./ && \
+                #cp -f \"$${QTDIR}/bin/libwinpthread-1.dll\" ./ && \
+                #cp -f \"$${QTDIR}/bin/libgcc_s_dw2-1.dll\" ./ && \
+                #cp -f \"$${QTDIR}/bin/libstdc++-6.dll\" ./
 }
 
 unix:!macx{
@@ -149,6 +152,7 @@ SOURCES += \
     PluginsManager.cpp \
     Plugin.cpp \
     LightpackPluginInterface.cpp \
+    TimeEvaluations.cpp \
     wizard/ZoneWidget.cpp \
     wizard/ZonePlacementPage.cpp \
     wizard/Wizard.cpp \

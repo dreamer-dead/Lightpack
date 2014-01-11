@@ -18,11 +18,11 @@ GAPIProxyFrameGrabber::~GAPIProxyFrameGrabber() {
 }
 
 bool GAPIProxyFrameGrabber::startOverallPerfCount() {
-    return QueryPerformanceCounter(&m_pcStart);
+    return !!QueryPerformanceCounter(&m_pcStart);
 }
 
 bool GAPIProxyFrameGrabber::startOriginalPerfCount() {
-    return QueryPerformanceCounter(&m_pcIntermediate);
+    return !!QueryPerformanceCounter(&m_pcIntermediate);
 }
 
 bool GAPIProxyFrameGrabber::stopPerfCount() {

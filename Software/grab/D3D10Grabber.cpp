@@ -36,6 +36,7 @@
 #define D3D9_SCPRESENT_FUNC_ORD 3
 #define D3D9_PRESENT_FUNC_ORD 17
 
+#if !defined _MSC_VER
 #define __in
 #define __out
 #define __inout
@@ -51,6 +52,8 @@
 #define __out_ecount(x)
 #define __in_ecount_opt(x)
 #define __out_ecount_opt(x)
+#endif // !defined _MSC_VER
+
 #include<initguid.h>
 #include"DXGI.h"
 #include"D3D10_1.h"
@@ -459,7 +462,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
     return presentFuncOffset;
 }
 
-typedef IDirect3D9 * WINAPI (*Direct3DCreate9Func)(UINT SDKVersion);
+typedef IDirect3D9 * (WINAPI *Direct3DCreate9Func)(UINT SDKVersion);
 UINT GetD3D9PresentOffset(HWND hWnd){
     IDirect3D9 *pD3D = NULL;
     HINSTANCE hD3d9 = LoadLibrary(L"d3d9.dll");

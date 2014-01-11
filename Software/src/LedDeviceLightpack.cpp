@@ -27,7 +27,7 @@
 #include "LedDeviceLightpack.hpp"
 //#include "LightpackApplication.hpp"
 
-#include <unistd.h>
+//#include <unistd.h>
 
 #include <QtDebug>
 #include "debug.h"

@@ -7,6 +7,9 @@
 
 #ifndef HOOKSDLL_H
 #define	HOOKSDLL_H
+
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include"windows.h"
 
 #ifdef HOOKSDLL_EXPORTS

@@ -31,7 +31,7 @@
 #include "LedDeviceAlienFx.hpp"
 #include "Settings.hpp"
 
-#include <unistd.h>
+//#include <unistd.h>
 
 #include <QtDebug>
 #include "debug.h"

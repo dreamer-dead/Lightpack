@@ -29,9 +29,19 @@
 
 #include <QApplication>
 #include <qdesktopwidget.h>
+//#include "PrismatikMath.hpp"
 #include "../src/debug.h"
 #include "cmath"
 #define BYTES_PER_PIXEL 4
+
+//using PrismatikMath::round;
+
+#if defined _MSC_VER
+static double round(double number)
+{
+    return number < 0.0 ? std::ceil(number - 0.5) : std::floor(number + 0.5);
+}
+#endif // _MSC_VER
 
 D3D9Grabber::D3D9Grabber(QObject * parent, QList<QRgb> *grabResult, QList<GrabWidget *> *grabAreasGeometry)
     : TimeredGrabber(parent, grabResult, grabAreasGeometry), m_d3D(NULL), m_d3Device(NULL), m_surface(NULL)

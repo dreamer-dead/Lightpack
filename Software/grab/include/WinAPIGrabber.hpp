@@ -30,6 +30,8 @@
 #ifdef WINAPI_GRAB_SUPPORT
 
 #define WINVER 0x0500 /* Windows2000 for MonitorFromWindow(..) func */
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
 

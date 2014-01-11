@@ -13,7 +13,9 @@ CONFIG += staticlib
 
 include(../build-config.prf)
 
-INCLUDEPATH += ./include ../src
+LIBS += -lprismatik-math
+
+INCLUDEPATH += ./include ../src ../math/include
 
 HEADERS += \
     include/calculations.hpp \
