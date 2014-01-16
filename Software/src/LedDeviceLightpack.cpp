@@ -27,6 +27,7 @@
 #include "LedDeviceLightpack.hpp"
 //#include "LightpackApplication.hpp"
 
+#include <algorithm>
 //#include <unistd.h>
 
 #include <QtDebug>
@@ -70,7 +71,7 @@ void LedDeviceLightpack::setColors(const QList<QRgb> & colors)
 #if 0
     DEBUG_LOW_LEVEL << Q_FUNC_INFO << "thread id: " << this->thread()->currentThreadId();
 #endif
-    if (colors.count() > maxLedsCount()) {
+    if (static_cast<size_t>(colors.count()) > maxLedsCount()) {
         qWarning() << Q_FUNC_INFO << "data size is greater than max leds count";
 
         // skip command with wrong data size
@@ -138,9 +139,9 @@ void LedDeviceLightpack::switchOffLeds()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-    if (m_colorsSaved.count() == 0)
+    if (m_colorsSaved.empty())
     {
-        for (int i = 0; i < maxLedsCount(); i++)
+        for (size_t i = 0; i < maxLedsCount(); ++i)
             m_colorsSaved << 0;
     } else {
         for (int i = 0; i < m_colorsSaved.count(); i++)
@@ -425,22 +426,20 @@ bool LedDeviceLightpack::writeBufferToDeviceWithCheck(int command, hid_device *p
 
 void LedDeviceLightpack::resizeColorsBuffer(int buffSize)
 {
-    if (m_colorsBuffer.count() == buffSize)
+    if (m_colorsBuffer.count() == buffSize || buffSize < 0)
         return;
 
     m_colorsBuffer.clear();
 
-    if (buffSize > maxLedsCount())
+    size_t checkedBufferSize = buffSize;
+    if (checkedBufferSize > maxLedsCount())
     {
-        qCritical() << Q_FUNC_INFO << "buffSize > MaximumLedsCount" << buffSize << ">" << maxLedsCount();
+        qCritical() << Q_FUNC_INFO << "buffSize > MaximumLedsCount" << checkedBufferSize << ">" << maxLedsCount();
 
-        buffSize = maxLedsCount();
+        checkedBufferSize = maxLedsCount();
     }
 
-    for (int i = 0; i < buffSize; i++)
-    {
-        m_colorsBuffer << StructRgb();
-    }
+    std::fill_n(std::back_inserter(m_colorsBuffer), checkedBufferSize, StructRgb());
 }
 
 void LedDeviceLightpack::closeDevices()

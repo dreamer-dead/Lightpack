@@ -166,14 +166,14 @@ void D3D9Grabber::clipRect(RECT *rect, D3DSURFACE_DESC *surfaceDesc) {
     if (rect->left < 0) {
         rect->left = 0;
     }
-    if (rect->right > surfaceDesc->Width) {
+    if (static_cast<UINT>(rect->right) > surfaceDesc->Width) {
         rect->right = surfaceDesc->Width;
     }
     if (rect->top < 0) {
         rect->top = 0;
     }
 
-    if (rect->bottom > surfaceDesc->Height) {
+    if (static_cast<UINT>(rect->bottom) > surfaceDesc->Height) {
         rect->bottom = surfaceDesc->Height;
     }
 }

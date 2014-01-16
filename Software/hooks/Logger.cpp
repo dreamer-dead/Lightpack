@@ -66,7 +66,7 @@ void Logger::reportLog(DWORD type, DWORD msgId, const LPWSTR message, va_list ap
         ZeroMemory(m_reportLogBuf, sizeof(m_reportLogBuf));
         int sprintfResult = wvsprintfW(m_reportLogBuf, message, ap);
         if (sprintfResult > -1)
-            ReportEventW(m_hEventSrc, type, 0, msgId, NULL, 1, 0, const_cast<const WCHAR **>(&m_reportLogBuf), NULL);
+            ReportEventW(m_hEventSrc, type & 0xFFFF, 0, msgId, NULL, 1, 0, const_cast<const WCHAR **>(&m_reportLogBuf), NULL);
     }
 }
 

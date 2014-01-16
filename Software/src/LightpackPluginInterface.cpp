@@ -576,6 +576,10 @@ int LightpackPluginInterface::GetBacklight()
         return 2;
         break;
     }
+
+    qWarning() << "Unsupported Lightpack::Mode: " << (int)mode;
+    // TODO: use more suitable value.
+    return 0;
 }
 
 QString LightpackPluginInterface::GetPluginsDir()

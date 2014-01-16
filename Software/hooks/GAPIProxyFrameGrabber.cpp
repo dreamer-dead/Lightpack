@@ -4,7 +4,7 @@
 
 GAPIProxyFrameGrabber::GAPIProxyFrameGrabber(HANDLE syncRunMutex) {
     LARGE_INTEGER liFreq;
-    QueryPerformanceFrequency(&m_liFreq);
+    QueryPerformanceFrequency(&liFreq);
     m_liFreq.QuadPart = liFreq.QuadPart / 1000;
     m_pcOverall.QuadPart = 0;
     m_pcOriginal.QuadPart = 0;

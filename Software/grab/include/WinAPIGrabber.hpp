@@ -29,7 +29,13 @@
 #include "../src/enums.hpp"
 #ifdef WINAPI_GRAB_SUPPORT
 
+#if defined WINVER && WINVER < 0x0500
+#undef WINVER
+#endif
+
+#if !defined WINVER
 #define WINVER 0x0500 /* Windows2000 for MonitorFromWindow(..) func */
+#endif
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 

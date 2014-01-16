@@ -8,12 +8,18 @@
 
 TARGET      = Prismatik
 #PRE_TARGETDEPS += ../lib/libgrab.a
-PRE_TARGETDEPS += ../lib/grab.lib
+#PRE_TARGETDEPS += ../lib/grab.lib
 DESTDIR     = bin
 TEMPLATE    = app
 QT         += network widgets
 win32 {
     QT += serialport
+}
+
+msvc {
+    PRE_TARGETDEPS += ../lib/grab.lib
+} else {
+    PRE_TARGETDEPS += ../lib/libgrab.a
 }
 macx {
     QT += serialport
@@ -67,6 +73,7 @@ unix:!macx{
 }
 
 win32 {
+    msvc: DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
     # Windows version using WinAPI for HID
     #LIBS    += -lhid -lusbcamd -lsetupapi
     LIBS    += -lsetupapi

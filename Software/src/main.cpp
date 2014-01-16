@@ -155,8 +155,9 @@ void openLogsFile(const QString & appDirPath)
     qDebug() << "Logs file:" << logFilePath;
 }
 
-void messageHandler(QtMsgType type, const QMessageLogContext &ctx, const QString &msg)
+void messageHandler(QtMsgType type, const QMessageLogContext & ctx, const QString &msg)
 {
+    Q_UNUSED(ctx);
     QMutexLocker locker(&m_mutex);
 
     QString out = QDateTime::currentDateTime().time().toString("hh:mm:ss:zzz") + " ";

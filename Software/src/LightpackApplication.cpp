@@ -146,6 +146,8 @@ HWND LightpackApplication::getMainWindowHandle() {
 }
 
 bool LightpackApplication::winEventFilter ( MSG * msg, long * result ) {
+    Q_UNUSED(result);
+
     const unsigned char POWER_RESUME  = 0x01;
     const unsigned char POWER_SUSPEND = 0x02;
     static unsigned char processed = 0x00;
@@ -269,6 +271,7 @@ void LightpackApplication::onFocusChanged(QWidget *old, QWidget *now)
 
 void LightpackApplication::quitFromWizard(int result)
 {
+    Q_UNUSED(result);
     quit();
 }
 

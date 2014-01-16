@@ -149,9 +149,6 @@ bool D3D10Grabber::initIPC(LPSECURITY_ATTRIBUTES lpsa) {
         return false;
     }
 
-    sockaddr_in localhost;
-    in_addr adr;
-
     m_sharedMem = CreateFileMappingW(INVALID_HANDLE_VALUE, lpsa, PAGE_READWRITE, 0, HOOKSGRABBER_SHARED_MEM_SIZE, HOOKSGRABBER_SHARED_MEM_NAME );
     if(!m_sharedMem) {
         m_sharedMem = OpenFileMappingW(GENERIC_READ | GENERIC_WRITE, false, HOOKSGRABBER_SHARED_MEM_NAME);
@@ -222,6 +219,8 @@ void D3D10Grabber::init(void) {
             return;
         }
 
+#if 0
+        // TODO: Remove this code or use |sa| in initIPC()
         SECURITY_ATTRIBUTES sa;
         SECURITY_DESCRIPTOR sd;
 
@@ -237,6 +236,7 @@ void D3D10Grabber::init(void) {
         sa.nLength = sizeof(sa);
         sa.lpSecurityDescriptor = &sd;
         sa.bInheritHandle = FALSE;
+#endif
 
         if (!initIPC(NULL)) {
             freeIPC();
@@ -256,7 +256,9 @@ void D3D10Grabber::init(void) {
         connect(m_worker, SIGNAL(frameGrabbed()), this, SLOT(grab()));
         QMetaObject::invokeMethod(m_worker, "runLoop", Qt::QueuedConnection);
 
+#if 0
         FreeRestrictedSD(ptr);
+#endif
 
         m_checkIfFrameGrabbedTimer = new QTimer();
         m_checkIfFrameGrabbedTimer->setSingleShot(false);
@@ -751,12 +753,12 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, const WCHAR *wstrSyst
             if( EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
             {
                 bool isDXPresent = false;
-                for ( int j = 0; j < (cbNeeded / sizeof(HMODULE)); j++ )
+                for ( DWORD j = 0; j < (cbNeeded / sizeof(HMODULE)); j++ )
                 {
-                    TCHAR szModName[MAX_PATH];
+                    WCHAR szModName[MAX_PATH];
 
-                    if ( GetModuleFileNameEx( hProcess, hMods[j], szModName,
-                                              sizeof(szModName) / sizeof(TCHAR)))
+                    if ( GetModuleFileNameExW( hProcess, hMods[j], szModName,
+                                              sizeof(szModName) / sizeof(WCHAR)))
                     {
 
                         PathStripPathW(szModName);
@@ -785,19 +787,11 @@ nextProcess:
     return processes;
 }
 PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD) {
-
     DWORD  dwAclLength;
-
     PSID   pAuthenticatedUsersSID = NULL;
-
     PACL   pDACL   = NULL;
     BOOL   bResult = FALSE;
-
-    PACCESS_ALLOWED_ACE pACE = NULL;
-
     SID_IDENTIFIER_AUTHORITY siaNT = SECURITY_NT_AUTHORITY;
-
-    SECURITY_INFORMATION si = DACL_SECURITY_INFORMATION;
 
     // initialize the security descriptor
     if (!InitializeSecurityDescriptor(pSD,
