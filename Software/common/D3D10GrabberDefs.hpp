@@ -38,15 +38,15 @@
 #define HOOKSGRABBER_BLANK_FRAME_ID 0xffffffff
 
 struct HOOKSGRABBER_SHARED_MEM_DESC {
-    UINT d3d9PresentFuncOffset;
-    UINT d3d9SCPresentFuncOffset;
-    UINT dxgiPresentFuncOffset;
-    UINT width;
-    UINT height;
-    UINT rowPitch;
+    unsigned d3d9PresentFuncOffset;
+    unsigned d3d9SCPresentFuncOffset;
+    unsigned dxgiPresentFuncOffset;
+    unsigned width;
+    unsigned height;
+    unsigned rowPitch;
     BufferFormat format;
-    UINT frameId;
-    UINT logLevel;
+    unsigned frameId;
+    unsigned logLevel;
 };
 
 
