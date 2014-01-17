@@ -40,7 +40,7 @@ WinAPIGrabberEachWidget::WinAPIGrabberEachWidget(QObject * parent, QList<QRgb> *
       isBufferNeedsResize(true),
       hScreenDC(NULL),
       hMemDC(NULL),
-      hScreenDC(NULL)
+      hBitmap(NULL)
 {
 }
 
@@ -87,7 +87,7 @@ void WinAPIGrabberEachWidget::captureWidget(const QWidget * w)
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "screenWidth x screenHeight" << screenWidth << "x" << screenHeight;
 
         // Release previous resorces.
-        release();
+        freeDCs();
 
         // CreateDC for multiple monitors
         hScreenDC = CreateDC( TEXT("DISPLAY"), NULL, NULL, NULL );
@@ -154,9 +154,9 @@ QRgb WinAPIGrabberEachWidget::getColor(int x, int y, int width, int height)
     DEBUG_HIGH_LEVEL << Q_FUNC_INFO
                      << "x y w h:" << x << y << width << height;
 
-    if (pbPixelsBuff == NULL)
+    if (pbPixelsBuff.empty())
     {
-        qCritical() << Q_FUNC_INFO << "pbPixelsBuff == NULL";
+        qCritical() << Q_FUNC_INFO << "pbPixelsBuff is empty!";
         return 0;
     }
 

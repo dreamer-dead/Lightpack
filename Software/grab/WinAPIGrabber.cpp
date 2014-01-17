@@ -34,7 +34,7 @@ WinAPIGrabber::WinAPIGrabber(QObject * parent, QList<QRgb> *grabResult, QList<Gr
     : TimeredGrabber(parent, grabResult, grabAreasGeometry),
         hScreenDC(NULL),
         hMemDC(NULL),
-        hScreenDC(NULL)
+        hBitmap(NULL)
 {
     pbPixelsBuff = NULL;
 }
