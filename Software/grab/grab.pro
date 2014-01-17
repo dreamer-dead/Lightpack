@@ -32,7 +32,10 @@ SOURCES += \
     QtGrabber.cpp \
     GrabberBase.cpp
 
-msvc:DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+CONFIG(msvc) {
+    DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+}
+
 win32 {
     INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
     HEADERS += \
