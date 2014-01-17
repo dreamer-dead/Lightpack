@@ -48,26 +48,20 @@
 #define __out_ecount_opt(x)
 #endif // !defined _MSC_VER
 
+#include <QObject>
 #include <QThread>
-#include <initguid.h>
-#include <DXGI.h>
 #include <D3D10_1.h>
 #include <D3D10.h>
-#include <d3d9.h>
-#include <sddl.h>
-#include <shlwapi.h>
-#include <math.h>
 #include <cstdlib>
 #include <stdio.h>
 #include "calculations.hpp"
 #include "WinUtils.hpp"
 #include "WinDXUtils.hpp"
+#include"../../common/D3D10GrabberDefs.hpp"
 #include "../src/debug.h"
 #include "../libraryinjector/ILibraryInjector.h"
 
 #define SIZEOF_ARRAY(a) (sizeof(a)/sizeof(a[0]))
-
-const WCHAR lightpackHooksDllName[] = L"prismatik-hooks.dll";
 
 using namespace std;
 using namespace WinUtils;
@@ -75,15 +69,16 @@ using namespace WinUtils;
 namespace {
 class D3D10GrabberWorker: public QObject {
     Q_OBJECT
-    public:
-        D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa);
-        ~D3D10GrabberWorker();
-    private:
-        HANDLE m_frameGrabbedEvent;
-    signals:
-        void frameGrabbed();
-    public slots:
-        void runLoop();
+
+public:
+    D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa);
+    ~D3D10GrabberWorker();
+private:
+    HANDLE m_frameGrabbedEvent;
+signals:
+    void frameGrabbed();
+public slots:
+    void runLoop();
 };
 
 D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lpsa) : QObject(parent) {
@@ -91,6 +86,7 @@ D3D10GrabberWorker::D3D10GrabberWorker(QObject *parent, LPSECURITY_ATTRIBUTES lp
         qCritical() << Q_FUNC_INFO << "unable to create frameGrabbedEvent";
     }
 }
+
 D3D10GrabberWorker::~D3D10GrabberWorker() {
     if (m_frameGrabbedEvent)
         CloseHandle(m_frameGrabbedEvent);
@@ -497,6 +493,9 @@ private:
     HOOKSGRABBER_SHARED_MEM_DESC m_memDesc;
     D3D10Grabber &m_owner;
 };
+
+// This will force qmake and moc handle internal classes in this file.
+#include "D3D10Grabber.moc"
 
 D3D10Grabber::D3D10Grabber(QObject *parent, QList<QRgb> *grabResult, QList<GrabWidget *> *grabWidgets, GetHwndCallback_t getHwndCb)
     : GrabberBase(parent, grabResult, grabWidgets) {

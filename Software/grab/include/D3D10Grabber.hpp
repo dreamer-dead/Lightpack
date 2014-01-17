@@ -28,7 +28,6 @@
 #include<GrabberBase.hpp>
 #ifdef D3D10_GRAB_SUPPORT
 
-#include"../../common/D3D10GrabberDefs.hpp"
 #include<QList>
 #include<QScopedPointer>
 

@@ -2,10 +2,16 @@
 
 #include <psapi.h>
 #include <tlhelp32.h>
+#include <shlwapi.h>
+
+#include "../src/debug.h"
+
+#define SIZEOF_ARRAY(a) (sizeof(a)/sizeof(a[0]))
 
 namespace WinUtils
 {
 
+const WCHAR lightpackHooksDllName[] = L"prismatik-hooks.dll";
 static LPCWSTR pwstrExcludeProcesses[]={L"skype.exe", L"chrome.exe", L"firefox.exe"};
 
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable) {

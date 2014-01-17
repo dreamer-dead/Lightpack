@@ -31,9 +31,12 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <QList>
 
 namespace WinUtils
 {
+extern const WCHAR lightpackHooksDllName[];
+
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable);
 
 BOOL AcquirePrivileges();

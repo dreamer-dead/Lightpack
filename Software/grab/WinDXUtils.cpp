@@ -8,6 +8,8 @@
 #include <D3D10.h>
 #include <d3d9.h>
 
+#include "../src/debug.h"
+
 #define DXGI_PRESENT_FUNC_ORD 8
 #define D3D9_SCPRESENT_FUNC_ORD 3
 #define D3D9_PRESENT_FUNC_ORD 17
