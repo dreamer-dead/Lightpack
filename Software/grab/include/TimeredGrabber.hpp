@@ -28,6 +28,7 @@
 #define TIMEREDGRABBER_HPP
 
 #include <QTimer>
+#include <QScopedPointer>
 #include "GrabberBase.hpp"
 
 class TimeredGrabber : public GrabberBase
@@ -45,7 +46,7 @@ public slots:
     virtual void setGrabInterval(int msec);
 
 protected:
-    QTimer *m_timer;
+    QScopedPointer<QTimer> m_timer;
 };
 
 #endif // TIMEREDGRABBER_HPP
