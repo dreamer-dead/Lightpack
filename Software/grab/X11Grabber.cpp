@@ -27,6 +27,8 @@
 
 #ifdef X11_GRAB_SUPPORT
 
+#include <QPixmap>
+#include <QImage>
 #include <X11/Xutil.h>
 // x shared-mem extension
 #include <sys/shm.h>
@@ -55,7 +57,6 @@ X11Grabber::X11Grabber(QObject *parent, QList<QRgb> *grabResult, QList<GrabWidge
 X11Grabber::~X11Grabber()
 {
     XCloseDisplay(d->display);
-    delete d;
 }
 
 const char * X11Grabber::getName()
