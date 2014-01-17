@@ -67,11 +67,6 @@
 #include "shlwapi.h"
 #include "initguid.h"
 #include "calculations.hpp"
-// IID_ILibraryInjector   = {029587AD-87F3-4623-941F-E37BF99A6DB2}
-DEFINE_GUID(IID_ILibraryInjector  , 0x029587ad, 0x87f3, 0x4623, 0x94, 0x1f, 0xe3, 0x7b, 0xf9, 0x9a, 0x6d, 0xb2);
-
-// CLSID_ILibraryInjector = {FC9D8F66-7B9A-47b7-8C5B-830BFF0E48C9}
-DEFINE_GUID(CLSID_ILibraryInjector, 0xfc9d8f66, 0x7b9a, 0x47b7, 0x8c, 0x5b, 0x83, 0x0b, 0xff, 0x0e, 0x48, 0xc9);
 
 const WCHAR lightpackHooksDllName[] = L"prismatik-hooks.dll";
 
@@ -93,7 +88,7 @@ GetHwndCallback_t D3D10Grabber::m_getHwndCb = NULL;
 
 UINT D3D10Grabber::m_lastFrameId;
 
-LPWSTR pwstrExcludeProcesses[]={L"skype.exe", L"chrome.exe", L"firefox.exe"};
+LPCWSTR pwstrExcludeProcesses[]={L"skype.exe", L"chrome.exe", L"firefox.exe"};
 #define SIZEOF_ARRAY(a) (sizeof(a)/sizeof(a[0]))
 
 /*!
@@ -111,7 +106,7 @@ BOOL SetPrivilege(HANDLE hToken, LPCTSTR szPrivName, BOOL fEnable);
 
 BOOL AcquirePrivileges();
 
-QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, const WCHAR *wstrSystemRootPath);
+QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRootPath);
 
 PVOID BuildRestrictedSD(PSECURITY_DESCRIPTOR pSD);
 
@@ -183,9 +178,9 @@ bool D3D10Grabber::initIPC(LPSECURITY_ATTRIBUTES lpsa) {
         UnmapViewOfFile(memMap);
     }
 
-    m_mutex = CreateMutexW(lpsa, false, HOOKSGRABBER_MUTEX_MEM_NAME);
+    m_mutex = CreateMutexW(lpsa, FALSE, HOOKSGRABBER_MUTEX_MEM_NAME);
     if(!m_mutex) {
-        m_mutex = OpenMutexW(SYNCHRONIZE, false, HOOKSGRABBER_MUTEX_MEM_NAME);
+        m_mutex = OpenMutexW(SYNCHRONIZE, FALSE, HOOKSGRABBER_MUTEX_MEM_NAME);
         if(!m_mutex) {
             qCritical() << Q_FUNC_INFO << "couldn't create mutex. error code " << GetLastError();
             freeIPC();

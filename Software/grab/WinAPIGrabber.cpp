@@ -31,7 +31,10 @@
 #include "../src/enums.hpp"
 
 WinAPIGrabber::WinAPIGrabber(QObject * parent, QList<QRgb> *grabResult, QList<GrabWidget *> *grabAreasGeometry)
-    : TimeredGrabber(parent, grabResult, grabAreasGeometry)
+    : TimeredGrabber(parent, grabResult, grabAreasGeometry),
+        hScreenDC(NULL),
+        hMemDC(NULL),
+        hScreenDC(NULL)
 {
     pbPixelsBuff = NULL;
 }

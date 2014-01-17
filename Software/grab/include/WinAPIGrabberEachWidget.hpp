@@ -59,6 +59,7 @@ private:
     void captureWidget(const QWidget * w);
     QRgb getColor(const QWidget * grabme);
     QRgb getColor(int x, int y, int width, int height);
+    void freeDCs();
 
 private:
     HMONITOR hMonitor;
@@ -70,8 +71,7 @@ private:
     unsigned screenHeight;
 
     // Captured screen buffer, contains actual RGB data in reversed order
-    BYTE * pbPixelsBuff;
-    unsigned pixelsBuffSize;
+    QVector<BYTE> pbPixelsBuff;
     unsigned bytesPerPixel;
 
     HDC hScreenDC;
