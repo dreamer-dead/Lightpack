@@ -10,12 +10,13 @@ DESTDIR  = ../lib
 TARGET   = libraryinjector
 TEMPLATE = lib
 LIBS += -luuid -lwsock32 -lole32 -ladvapi32 -luser32
-QMAKE_LFLAGS +=-Wl,--kill-at
 
 DEFINES += LIBRARYINJECTOR_LIBRARY DEBUG
 
-msvc {
+CONFIG(msvc) {
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
+} else {
+    QMAKE_LFLAGS +=-Wl,--kill-at
 }
 
 SOURCES += \

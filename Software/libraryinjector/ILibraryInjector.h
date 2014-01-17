@@ -26,7 +26,6 @@
 #ifndef _ILIBRARYINJECTOR_HEADER
 #define _ILIBRARYINJECTOR_HEADER
 
-#include <windows.h>
 #include <objbase.h>
 #include <initguid.h>
 
