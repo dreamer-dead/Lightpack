@@ -42,12 +42,16 @@ win32 {
             include/D3D9Grabber.hpp \
             include/D3D10Grabber.hpp \
             include/WinAPIGrabberEachWidget.hpp \
-            include/WinAPIGrabber.hpp
+            include/WinAPIGrabber.hpp \
+            include/WinUtils.hpp \
+            include/WinDXUtils.hpp
     SOURCES += \
             D3D9Grabber.cpp \
             D3D10Grabber.cpp \
             WinAPIGrabberEachWidget.cpp \
-            WinAPIGrabber.cpp
+            WinAPIGrabber.cpp \
+            WinUtils.cpp \
+            WinDXUtils.cpp
 }
 
 macx {
