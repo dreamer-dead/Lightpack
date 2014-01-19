@@ -12,8 +12,12 @@ TEMPLATE = lib
 
 include(../build-config.prf)
 
-INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
-               # ../zeromq/include
+# This will suppress gcc warnings in DX headers.
+CONFIG(gcc) {
+    QMAKE_CXXFLAGS += -isystem "$${DIRECTX_SDK_DIR}/Include"
+} else {
+    INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
+}
 
 LIBS += -lshlwapi -ladvapi32 -luser32 -L"$${DIRECTX_SDK_DIR}/Lib/x86" -ldxguid #-LD:/System/Users/Tim/Projects/Lightpack/Software/zeromq -lzmq.dll
 #QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
@@ -58,5 +62,6 @@ HEADERS += \
     Logger.hpp \
     LoggableTrait.hpp \
     ../common/BufferFormat.h \
-    msvcstub.h \
     D3D9FrameGrabber.hpp
+
+win32:HEADERS += ../common/msvcstub.h
