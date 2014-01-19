@@ -12,6 +12,7 @@ TEMPLATE = lib
 
 include(../build-config.prf)
 
+#INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
 # This will suppress gcc warnings in DX headers.
 CONFIG(gcc) {
     QMAKE_CXXFLAGS += -isystem "$${DIRECTX_SDK_DIR}/Include"
@@ -31,7 +32,7 @@ DEFINES += HOOKSDLL_EXPORTS UNICODE
 CONFIG(msvc) {
     DEFINES += _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE
 } else {
-    QMAKE_CXXFLAGS = -std=c++11
+    QMAKE_CXXFLAGS += -std=c++11
     QMAKE_LFLAGS += -static
 }
 

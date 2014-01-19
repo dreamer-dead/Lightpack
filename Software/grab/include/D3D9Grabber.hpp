@@ -31,8 +31,13 @@
 #ifdef D3D9_GRAB_SUPPORT
 
 // <d3d9.h> includes <windows.h>
+#if !defined NOMINMAX
 #define NOMINMAX
+#endif
+
+#if !defined WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <d3d9.h>
 
 using namespace Grab;

@@ -2,13 +2,13 @@
 
 #include <QtGlobal>
 #include <QString>
+#include "../src/debug.h"
 
+#include "../../common/msvcstub.h"
 #include <DXGI.h>
 #include <D3D10_1.h>
 #include <D3D10.h>
 #include <d3d9.h>
-
-#include "../src/debug.h"
 
 #define DXGI_PRESENT_FUNC_ORD 8
 #define D3D9_SCPRESENT_FUNC_ORD 3
@@ -24,12 +24,12 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
     HRESULT hresult = CreateDXGIFactory(IID_IDXGIFactory, reinterpret_cast<void **>(&factory));
     if (hresult != S_OK) {
         qCritical() << "Can't create DXGIFactory. " << hresult;
-        return NULL;
+        return 0;
     }
     hresult = factory->EnumAdapters(0, &adapter);
     if (hresult != S_OK) {
         qCritical() << "Can't enumerate adapters. " << hresult;
-        return NULL;
+        return 0;
     }
 
     DXGI_MODE_DESC dxgiModeDesc;
@@ -59,7 +59,7 @@ UINT GetDxgiPresentOffset(HWND hwnd) {
     hresult = D3D10CreateDeviceAndSwapChain(adapter, D3D10_DRIVER_TYPE_HARDWARE, NULL, 0, D3D10_SDK_VERSION, &dxgiSwapChainDesc, &pSc, &pDev);
     if (S_OK != hresult) {
         qCritical() << Q_FUNC_INFO << QString("Can't create D3D10Device and SwapChain. hresult = 0x%1").arg(QString::number(hresult, 16));
-        return NULL;
+        return 0;
     }
 
 
@@ -94,7 +94,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     if ( !pD3D)
     {
         qCritical() << "Test_DirectX9 Direct3DCreate9(%d) call FAILED" << D3D_SDK_VERSION ;
-        return NULL;
+        return 0;
     }
 
     // step 3: Get IDirect3DDevice9
@@ -103,7 +103,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     if (FAILED(hRes))
     {
         qCritical() << QString("Test_DirectX9 GetAdapterDisplayMode failed. 0x%x").arg( hRes);
-        return NULL;
+        return 0;
     }
 
     D3DPRESENT_PARAMETERS d3dpp;
@@ -122,7 +122,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     if (FAILED(hRes))
     {
         qCritical() << QString("Test_DirectX9 CreateDevice failed. 0x%x").arg(hRes);
-        return NULL;
+        return 0;
     }
 
     IDirect3DSwapChain9 *pD3DSwapChain;
@@ -130,7 +130,7 @@ UINT GetD3D9PresentOffset(HWND hWnd){
     if (FAILED(hRes))
     {
         qCritical() << QString("Test_DirectX9 GetSwapChain failed. 0x%x").arg(hRes);
-        return NULL;
+        return 0;
     }
     else
     {
@@ -162,7 +162,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     if ( !pD3D)
     {
         qCritical() << "Test_DirectX9 Direct3DCreate9(%d) call FAILED" << D3D_SDK_VERSION ;
-        return NULL;
+        return 0;
     }
 
     // step 3: Get IDirect3DDevice9
@@ -171,7 +171,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     if (FAILED(hRes))
     {
         qCritical() << QString("Test_DirectX9 GetAdapterDisplayMode failed. 0x%x").arg( hRes);
-        return NULL;
+        return 0;
     }
 
     D3DPRESENT_PARAMETERS d3dpp;
@@ -190,7 +190,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     if (FAILED(hRes))
     {
         qCritical() << QString("Test_DirectX9 CreateDevice failed. 0x%x").arg(hRes);
-        return NULL;
+        return 0;
     }
 
     IDirect3DSwapChain9 *pD3DSwapChain;
@@ -198,7 +198,7 @@ UINT GetD3D9SCPresentOffset(HWND hWnd){
     if (FAILED(hRes))
     {
         qCritical() << QString("Test_DirectX9 GetSwapChain failed. 0x%x").arg(hRes);
-        return NULL;
+        return 0;
     }
     else
     {

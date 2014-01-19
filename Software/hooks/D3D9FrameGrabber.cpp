@@ -2,7 +2,7 @@
 #include "IPCContext.hpp"
 
 #include "hooksutils.h"
-#include "msvcstub.h"
+#include "../common/msvcstub.h"
 #include <initguid.h>
 #include "d3d9types.h"
 #include "d3d9.h"
@@ -87,7 +87,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
         logger->reportLogDebug(L"D3D9Present");
         HRESULT hRes;
 
-        RECT newRect = {0};
+        RECT newRect = RECT();
         IDirect3DSurface9 *pBackBuffer = NULL;
         IDirect3DSurface9 *pDemultisampledSurf = NULL;
         IDirect3DSurface9 *pOffscreenSurf = NULL;
@@ -167,7 +167,7 @@ HRESULT WINAPI D3D9Present(IDirect3DDevice9 *pDev, CONST RECT* pSourceRect,CONST
             memcpy(ipcContext->m_pMemMap, &(ipcContext->m_memDesc), sizeof (ipcContext->m_memDesc));
     //        reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d9 writing data to mem mapped file");
             PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (ipcContext->m_memDesc));
-            if (lockedSrcRect.Pitch == surfDesc.Width * 4) {
+            if (static_cast<UINT>(lockedSrcRect.Pitch) == surfDesc.Width * 4) {
                 memcpy(pMemDataMap, lockedSrcRect.pBits, surfDesc.Width * surfDesc.Height * 4);
             } else {
                 UINT i = 0, cleanOffset = 0, pitchOffset = 0;
@@ -219,7 +219,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
         logger->reportLogDebug(L"D3D9SCPresent");
         IDirect3DSurface9 *pBackBuffer = NULL;
         D3DPRESENT_PARAMETERS params;
-        RECT newRect = {0};
+        RECT newRect = RECT();
         IDirect3DSurface9 *pDemultisampledSurf = NULL;
         IDirect3DSurface9 *pOffscreenSurf = NULL;
         IDirect3DDevice9 *pDev = NULL;
@@ -300,7 +300,7 @@ HRESULT WINAPI D3D9SCPresent(IDirect3DSwapChain9 *pSc, CONST RECT* pSourceRect,C
             memcpy(ipcContext->m_pMemMap, &ipcContext->m_memDesc, sizeof (ipcContext->m_memDesc));
     //        reportLog(EVENTLOG_INFORMATION_TYPE, L"d3d9sc writing data to mem mapped file");
             PVOID pMemDataMap = incPtr(ipcContext->m_pMemMap, sizeof (ipcContext->m_memDesc));
-            if (lockedSrcRect.Pitch == surfDesc.Width * 4) {
+            if (static_cast<UINT>(lockedSrcRect.Pitch) == surfDesc.Width * 4) {
                 memcpy(pMemDataMap, lockedSrcRect.pBits, surfDesc.Width * surfDesc.Height * 4);
             } else {
                 UINT i = 0, cleanOffset = 0, pitchOffset = 0;

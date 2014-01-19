@@ -85,7 +85,7 @@ QList<DWORD> * getDxProcessesIDs(QList<DWORD> * processes, LPCWSTR wstrSystemRoo
             ::WideCharToMultiByte(CP_ACP, 0, executableName, -1, debug_buf, 255, NULL, NULL);
             DEBUG_MID_LEVEL << Q_FUNC_INFO << debug_buf;
 
-            for (int k=0; k < SIZEOF_ARRAY(pwstrExcludeProcesses); k++) {
+            for (unsigned k=0; k < SIZEOF_ARRAY(pwstrExcludeProcesses); k++) {
                 if (wcsicmp(executableName, pwstrExcludeProcesses[k])== 0) {
                     DEBUG_MID_LEVEL << Q_FUNC_INFO << "skipping " << pwstrExcludeProcesses;
                     goto nextProcess;

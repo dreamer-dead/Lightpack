@@ -110,7 +110,8 @@ void WinAPIGrabberEachWidget::captureWidget(const QWidget * w)
 
         DEBUG_LOW_LEVEL << Q_FUNC_INFO << "Allocate memory for pbPixelsBuff and update pixelsBuffSize, bytesPerPixel";
 
-        BITMAP bmp = {0};
+        BITMAP bmp;
+        memset(&bmp, 0, sizeof(BITMAP));
 
         // Now get the actual Bitmap
         GetObject( hBitmap, sizeof(BITMAP), &bmp );

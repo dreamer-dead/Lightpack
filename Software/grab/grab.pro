@@ -37,8 +37,14 @@ CONFIG(msvc) {
 }
 
 win32 {
-    INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
+    # This will suppress gcc warnings in DX headers.
+    CONFIG(gcc) {
+        QMAKE_CXXFLAGS += -isystem "$${DIRECTX_SDK_DIR}/Include"
+    } else {
+        INCLUDEPATH += "$${DIRECTX_SDK_DIR}/Include"
+    }
     HEADERS += \
+            ../common/msvcstub.h \
             include/D3D9Grabber.hpp \
             include/D3D10Grabber.hpp \
             include/WinAPIGrabberEachWidget.hpp \

@@ -36,8 +36,13 @@
 #if !defined WINVER
 #define WINVER 0x0500 /* Windows2000 for MonitorFromWindow(..) func */
 #endif
+#if !defined NOMINMAX
 #define NOMINMAX
+#endif
+
+#if !defined WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 
 #include <windows.h>
 

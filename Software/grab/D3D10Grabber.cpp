@@ -30,28 +30,8 @@
 #include <winsock2.h>
 #define WINAPI_INLINE WINAPI
 
-#if !defined _MSC_VER
-#define __in
-#define __out
-#define __inout
-#define __inout_opt
-#define __in_bcount(x)
-#define __out_bcount(x)
-#define __out_bcount_opt(x)
-#define __in_bcount_opt(x)
-#define __in_opt
-#define __out_opt
-#define __out_ecount_part_opt(x,y)
-#define __in_ecount(x)
-#define __out_ecount(x)
-#define __in_ecount_opt(x)
-#define __out_ecount_opt(x)
-#endif // !defined _MSC_VER
-
 #include <QObject>
 #include <QThread>
-#include <D3D10_1.h>
-#include <D3D10.h>
 #include <cstdlib>
 #include <stdio.h>
 #include "calculations.hpp"
@@ -60,6 +40,10 @@
 #include"../../common/D3D10GrabberDefs.hpp"
 #include "../src/debug.h"
 #include "../libraryinjector/ILibraryInjector.h"
+
+#include "../../common/msvcstub.h"
+#include <D3D10_1.h>
+#include <D3D10.h>
 
 #define SIZEOF_ARRAY(a) (sizeof(a)/sizeof(a[0]))
 
@@ -149,7 +133,8 @@ public:
             return false;
         }
 
-        HOOKSGRABBER_SHARED_MEM_DESC memDesc = {0};
+        HOOKSGRABBER_SHARED_MEM_DESC memDesc;
+        memset(&memDesc, 0, sizeof(HOOKSGRABBER_SHARED_MEM_DESC));
         if (fillMemoryDesc(&memDesc) && copyMemDesc(memDesc)) {
             memcpy(&m_memDesc, &memDesc, sizeof(HOOKSGRABBER_SHARED_MEM_DESC));
         } else {

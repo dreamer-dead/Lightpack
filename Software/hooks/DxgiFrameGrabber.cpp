@@ -1,11 +1,10 @@
 #include "DxgiFrameGrabber.hpp"
 
 #include "hooksutils.h"
-#include "msvcstub.h"
+#include "../common/msvcstub.h"
 #include <initguid.h>
-#include "DXGI.h"
 #include "D3D11.h"
-#include "D3DX11tex.h"
+#include "DXGI.h"
 #include "D3D10.h"
 #include "D3DX10tex.h"
 

@@ -16,14 +16,8 @@
 
 bool WriteToProtectedMem(void * mem, void * newVal, void * savedVal, size_t size);
 
-#if defined _MSC_VER
 inline void * incPtr(void * ptr, UINT offset) {
     return (void *)( (DWORD_PTR)ptr + offset );
 }
-#else
-inline void * incPtr(void * ptr, UINT offset) {
-    return ptr + offset;
-}
-#endif
 
 #endif // HOOKSUTILS_H
