@@ -193,6 +193,7 @@ void LightpackApplication::setBacklightChanged(Lightpack::Mode mode)
 
 void LightpackApplication::setDeviceLockViaAPI(DeviceLocked::DeviceLockStatus status, QList<QString> modules)
 {
+    Q_UNUSED(modules);
     m_deviceLockStatus = status;
 
     if (m_grabManager == NULL)
@@ -217,7 +218,8 @@ void LightpackApplication::startBacklight()
 
     Settings::setIsBacklightEnabled(isBacklightEnabled);
 
-    switch (Settings::getLightpackMode())
+    const Lightpack::Mode lightpackMode = Settings::getLightpackMode();
+    switch (lightpackMode)
     {
     case Lightpack::AmbilightMode:
         m_grabManager->start(isCanStart);
@@ -227,6 +229,10 @@ void LightpackApplication::startBacklight()
     case Lightpack::MoodLampMode:
         m_grabManager->start(false);
         m_moodlampManager->start(isCanStart);
+        break;
+
+    default:
+        qWarning() << Q_FUNC_INFO << "lightpackMode unsupported value =" << lightpackMode;
         break;
     }
 

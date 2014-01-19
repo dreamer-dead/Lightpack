@@ -847,8 +847,6 @@ void SettingsWindow::showAbout()
 {
     DEBUG_LOW_LEVEL << Q_FUNC_INFO;
 
-    QRect screen = QApplication::desktop()->screenGeometry(this);
-
     emit requestFirmwareVersion();
 
     ui->tabWidget->setCurrentWidget(ui->tabAbout);
@@ -1089,6 +1087,10 @@ void SettingsWindow::onLightpackModeChanged(Lightpack::Mode mode)
             // Switch off smooth if moodlamp liquid mode
             emit updateSmoothSlowdown(0);
         }
+        break;
+
+    default:
+        DEBUG_LOW_LEVEL << "LightpacckMode unsuppotred value =" << mode;
         break;
     }
     backlightStatusChanged(m_backlightStatus);
