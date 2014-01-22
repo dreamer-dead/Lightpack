@@ -119,7 +119,7 @@ private:
     bool m_isDebugLevelObtainedFromCmdArgs;
     bool m_isApiServerConnectedToLedDeviceSignalsSlots;
     bool m_noGui;
-    bool m_deviceLockStatus;
+    DeviceLocked::DeviceLockStatus m_deviceLockStatus;
     bool m_isSettingsWindowActive;
     Backlight::Status m_backlightStatus;
 };

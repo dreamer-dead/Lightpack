@@ -126,7 +126,7 @@ macx{
  #           -framework CoreGraphics \
             -framework ApplicationServices \
             -framework OpenGL \
-            -L/opt/local/lib -lusb-1.0
+            #-L/opt/local/lib -lusb-1.0
 
     ICON = ../res/icons/Prismatik.icns
 
@@ -141,7 +141,6 @@ SOURCES += \
       GrabWidget.cpp  GrabConfigWidget.cpp \
     SpeedTest.cpp \
     LedDeviceLightpack.cpp \
-    LedDeviceAlienFx.cpp \
     LedDeviceAdalight.cpp \
     LedDeviceArdulight.cpp \
     LedDeviceVirtual.cpp \
@@ -187,7 +186,6 @@ HEADERS += \
     alienfx/LFXDecl.h \
     alienfx/LFX2.h \
     LedDeviceLightpack.hpp \
-    LedDeviceAlienFx.hpp \
     LedDeviceAdalight.hpp \
     LedDeviceArdulight.hpp \
     LedDeviceVirtual.hpp \
@@ -224,6 +222,12 @@ HEADERS += \
     wizard/PegasusDistributor.hpp \
     systrayicon/SysTrayIcon.hpp \
     systrayicon/SysTrayIcon_p.hpp
+
+win32 {
+    SOURCES += LedDeviceAlienFx.cpp
+
+    HEADERS += LedDeviceAlienFx.hpp
+}
 
 !contains(DEFINES,UNITY_DESKTOP) {
     HEADERS += systrayicon/SysTrayIcon_qt_p.hpp

@@ -227,7 +227,7 @@ void ApiServer::updateApiKey(const QString &key)
         m_isAuthEnabled = true;
 }
 
-void ApiServer::incomingConnection(int socketDescriptor)
+void ApiServer::incomingConnection(qintptr socketDescriptor)
 {
     QTcpSocket *client = new QTcpSocket(this);
     client->setSocketDescriptor(socketDescriptor);
@@ -530,6 +530,9 @@ void ApiServer::clientProcessCommands()
                 break;
             case Lightpack::MoodLampMode:
                 result = CmdResultBacklight_Moodlamp;
+                break;
+            default:
+                result = CmdSetResult_Error;
                 break;
             }
         }
