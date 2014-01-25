@@ -32,7 +32,9 @@
 TEMPLATE = subdirs
 CONFIG += ordered
 
-SUBDIRS = math grab
+SUBDIRS = math grab \
+    gtest_test \
+    gtest
 
 unix:!macx {
     SUBDIRS += qtserialport
