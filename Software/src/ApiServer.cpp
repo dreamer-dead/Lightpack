@@ -173,6 +173,15 @@ ApiServer::ApiServer(quint16 port, QObject *parent)
     }
 }
 
+ApiServer::~ApiServer()
+{
+}
+
+void ApiServer::stopWork()
+{
+    stopListening();
+}
+
 void ApiServer::setInterface(LightpackPluginInterface *lightpackInterface)
 {
     QString test = lightpack->Version();
@@ -1112,7 +1121,6 @@ void ApiServer::stopListening()
     QMap<QTcpSocket*, ClientInfo>::iterator i;
     for (i = m_clients.begin(); i != m_clients.end(); ++i)
     {
-
         QTcpSocket * client = dynamic_cast<QTcpSocket*>(i.key());
 
         QString sessionKey = m_clients[client].sessionKey;

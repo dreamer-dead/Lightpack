@@ -33,7 +33,7 @@ class SettingsWindowMockup : public QObject
 {
     Q_OBJECT
 public:
-    SettingsWindowMockup(QObject *parent) : QObject(parent)
+    SettingsWindowMockup()
     {
         m_status = Backlight::StatusOff;
         m_smooth = -1;

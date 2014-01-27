@@ -23,9 +23,9 @@ RCC_DIR     = stuff
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
-LIBS += -L../lib -lprismatik-math -lgrab
+LIBS += -L../lib -lprismatik-math -lgrab -lgtest
 
-INCLUDEPATH += ../src/ ../src/grab ../hooks ../grab/include ../math/include
+INCLUDEPATH += ../src/ ../src/grab ../hooks ../grab/include ../math/include ../gtest/include
 SOURCES += \
     LightpackApiTest.cpp \
     ../src/ApiServerSetColorTask.cpp \
@@ -44,7 +44,7 @@ SOURCES += \
     ../hooks/Logger.cpp
 
 HEADERS += \
-    ../src/grab/calculations.hpp \
+    ../src/grab/include/calculations.hpp \
     ../common/defs.h \
     ../src/enums.hpp \
     ../src/ApiServerSetColorTask.hpp \
@@ -54,11 +54,7 @@ HEADERS += \
     ../src/Plugin.hpp \
     ../src/LightpackPluginInterface.hpp \
     SettingsWindowMockup.hpp \
-    GrabCalculationTest.hpp \
-    LightpackApiTest.hpp \
-    lightpackmathtest.hpp \
     ../math/include/PrismatikMath.hpp \
-    HooksTest.h \
     ../hooks/ProxyFuncJmp.hpp \
     ../hooks/ProxyFunc.hpp \
     ../hooks/hooksutils.h \

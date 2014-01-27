@@ -26,6 +26,8 @@
 #include <QString>
 #include <QtWidgets/QApplication>
 #include <QTest>
+#include <QScopedPointer>
+#include <QtNetwork>
 
 #include "debug.h"
 #include "ApiServer.hpp"
@@ -36,150 +38,192 @@
 
 #include <stdlib.h>
 #include <iostream>
-#include "LightpackApiTest.hpp"
+//#include "LightpackApiTest.hpp"
+#include "gtest/gtest.h"
 
 using namespace std;
 using namespace SettingsScope;
 
 #define VERSION_API_TESTS   "1.4"
 
+// get
+// getstatus - on off
+// getstatusapi - busy idle
+// getprofiles - list name profiles
+// getprofile - current name profile
 
-LightpackApiTest::LightpackApiTest()
+// commands
+// lock - begin work with api (disable capture,backlight)
+// unlock - end work with api (enable capture,backlight)
+// setcolor:1-r,g,b;5-r,g,b;   numbering starts with 1
+// setgamma:2.00 - set gamma for setcolor
+// setsmooth:100 - set smooth in device
+// setprofile:<name> - set profile
+// setstatus:on - set status (on, off)
+class LightpackApiTest : public ::testing::Test
 {
-    // Register QMetaType for Qt::QueuedConnection
-    qRegisterMetaType< QList<QRgb> >("QList<QRgb>");
-    qRegisterMetaType<Backlight::Status>("Backlight::Status");
-}
+private:
+    virtual void SetUp();
+    virtual void TearDown();
 
-void LightpackApiTest::initTestCase()
+protected:
+    QByteArray readResult(QTcpSocket * socket);
+    void writeCommand(QTcpSocket * socket, const char * cmd);
+    bool writeCommandWithCheck(QTcpSocket * socket, const QByteArray & command, const QByteArray & result);
+
+    QString getProfilesResultString();
+    void processEventsFromLittle();
+
+    bool checkVersion(QTcpSocket * socket);
+    bool lock(QTcpSocket * socket);
+    bool unlock(QTcpSocket * socket);
+    bool setGamma(QTcpSocket * socket, QString gammaStr);
+
+protected:
+    QScopedPointer<ApiServer> m_apiServer;
+    QScopedPointer<QThread> m_apiServerThread;
+    QScopedPointer<LightpackPluginInterface> m_interfaceApi;
+    QScopedPointer<SettingsWindowMockup> m_little;
+
+    QScopedPointer<QTcpSocket> m_socket;
+    bool m_sockReadLineOk;
+};
+
+void LightpackApiTest::SetUp()
 {
-    Settings::Initialize(QDir::currentPath(), true);
-
-    m_socket = NULL;
+    static bool kOneTimeInit = false;
+    if (!kOneTimeInit) {
+        // Register QMetaType for Qt::QueuedConnection
+        qRegisterMetaType< QList<QRgb> >("QList<QRgb>");
+        qRegisterMetaType<Backlight::Status>("Backlight::Status");
+        Settings::Initialize(QDir::currentPath(), true);
+        kOneTimeInit = true;
+    }
 
     // Start Api Server in separate thread for access by QTcpSocket-s
-    m_apiServer = new ApiServer(3636);
-    m_interfaceApi = new LightpackPluginInterface();
-    m_apiServer->setInterface(m_interfaceApi);
-    m_apiServerThread = new QThread();
+    m_apiServer.reset(new ApiServer(3636));
+    m_interfaceApi.reset(new LightpackPluginInterface());
+    m_apiServer->setInterface(m_interfaceApi.data());
+    m_apiServerThread.reset(new QThread());
 
-    m_apiServer->moveToThread(m_apiServerThread);
+    m_apiServer->moveToThread(m_apiServerThread.data());
     m_apiServerThread->start();
 
-    m_little = new SettingsWindowMockup(this);
+    m_little.reset(new SettingsWindowMockup());
 
-    connect(m_little, SIGNAL(enableApiServer(bool)), m_apiServer, SLOT(enableApiServer(bool)), Qt::DirectConnection);
-    connect(m_little, SIGNAL(updateApiKey(QString)), m_apiServer, SLOT(updateApiKey(QString)), Qt::DirectConnection);
-    connect(m_little, SIGNAL(updateApiPort(int)), m_apiServer, SLOT(updateApiPort(int)), Qt::DirectConnection);
+    QObject::connect(m_little.data(), SIGNAL(enableApiServer(bool)), m_apiServer.data(), SLOT(enableApiServer(bool)), Qt::DirectConnection);
+    QObject::connect(m_little.data(), SIGNAL(updateApiKey(QString)), m_apiServer.data(), SLOT(updateApiKey(QString)), Qt::DirectConnection);
+    QObject::connect(m_little.data(), SIGNAL(updateApiPort(int)), m_apiServer.data(), SLOT(updateApiPort(int)), Qt::DirectConnection);
 
-    connect(m_interfaceApi, SIGNAL(requestBacklightStatus()), m_little, SLOT(requestBacklightStatus()), Qt::QueuedConnection);
-    connect(m_little, SIGNAL(resultBacklightStatus(Backlight::Status)), m_interfaceApi, SLOT(resultBacklightStatus(Backlight::Status)), Qt::QueuedConnection);
+    QObject::connect(m_interfaceApi.data(), SIGNAL(requestBacklightStatus()), m_little.data(), SLOT(requestBacklightStatus()), Qt::QueuedConnection);
+    QObject::connect(m_little.data(), SIGNAL(resultBacklightStatus(Backlight::Status)), m_interfaceApi.data(), SLOT(resultBacklightStatus(Backlight::Status)), Qt::DirectConnection);
 
-    connect(m_interfaceApi, SIGNAL(updateLedsColors(QList<QRgb>)), m_little, SLOT(setLedColors(QList<QRgb>)), Qt::QueuedConnection);
-    connect(m_interfaceApi, SIGNAL(updateGamma(double)), m_little, SLOT(setGamma(double)), Qt::QueuedConnection);
-    connect(m_interfaceApi, SIGNAL(updateBrightness(int)), m_little, SLOT(setBrightness(int)), Qt::QueuedConnection);
-    connect(m_interfaceApi, SIGNAL(updateSmooth(int)), m_little, SLOT(setSmooth(int)), Qt::QueuedConnection);
-    connect(m_interfaceApi, SIGNAL(updateProfile(QString)), m_little, SLOT(setProfile(QString)), Qt::QueuedConnection);
-    connect(m_interfaceApi, SIGNAL(updateStatus(Backlight::Status)), m_little, SLOT(setStatus(Backlight::Status)), Qt::QueuedConnection);
+    QObject::connect(m_interfaceApi.data(), SIGNAL(updateLedsColors(QList<QRgb>)), m_little.data(), SLOT(setLedColors(QList<QRgb>)), Qt::QueuedConnection);
+    QObject::connect(m_interfaceApi.data(), SIGNAL(updateGamma(double)), m_little.data(), SLOT(setGamma(double)), Qt::QueuedConnection);
+    QObject::connect(m_interfaceApi.data(), SIGNAL(updateBrightness(int)), m_little.data(), SLOT(setBrightness(int)), Qt::QueuedConnection);
+    QObject::connect(m_interfaceApi.data(), SIGNAL(updateSmooth(int)), m_little.data(), SLOT(setSmooth(int)), Qt::QueuedConnection);
+    QObject::connect(m_interfaceApi.data(), SIGNAL(updateProfile(QString)), m_little.data(), SLOT(setProfile(QString)), Qt::QueuedConnection);
+    QObject::connect(m_interfaceApi.data(), SIGNAL(updateStatus(Backlight::Status)), m_little.data(), SLOT(setStatus(Backlight::Status)), Qt::QueuedConnection);
 
     m_little->setApiKey("");
-}
 
-void LightpackApiTest::init()
-{
-    if (m_socket == NULL)
-        m_socket = new QTcpSocket();
+    m_socket.reset(new QTcpSocket());
 
     // Reconnect to host before each test case
     m_socket->connectToHost("127.0.0.1", 3636);
 
     // Wait 5 second for connected
-    QVERIFY(m_socket->waitForConnected(5000));
-
-    // Check version of API and version of API Tests on match
-    QVERIFY(checkVersion(m_socket));
+    EXPECT_TRUE(m_socket->waitForConnected(5000));
 
     m_sockReadLineOk = false;
 }
 
-void LightpackApiTest::cleanup()
+void LightpackApiTest::TearDown()
 {
-    QVERIFY(m_socket != NULL);
+    EXPECT_TRUE(m_socket.data() != NULL);
 
     m_socket->abort();
+    m_socket.reset();
+
+    QMetaObject::invokeMethod(m_apiServer.data(), "stopWork", Qt::QueuedConnection);
+    //m_apiServer->stopWork();
+    m_apiServer.reset();
+    m_apiServerThread->exit();
 }
 
 //
 // Test cases
 //
-void LightpackApiTest::testCase_ApiVersion()
+TEST_F(LightpackApiTest, ApiVersionTest)
 {
-    // see init() for version check
+    // Check version of API and version of API Tests on match
+    EXPECT_TRUE(checkVersion(m_socket.data()));
 }
 
-void LightpackApiTest::testCase_GetStatus()
+TEST_F(LightpackApiTest, GetStatusTest)
 {       
     // Test Backlight Off state:
     m_little->setStatus(Backlight::StatusOff);
-    writeCommand(m_socket, ApiServer::CmdGetStatus);
+    writeCommand(m_socket.data(), ApiServer::CmdGetStatus);
 
     processEventsFromLittle();
 
-    QByteArray result = readResult(m_socket);
-    QVERIFY(result == ApiServer::CmdResultStatus_Off);
+    QByteArray result = readResult(m_socket.data());
+    EXPECT_TRUE(result == ApiServer::CmdResultStatus_Off);
 
     // Test Backlight On state:
     m_little->setStatus(Backlight::StatusOn);
-    writeCommand(m_socket, ApiServer::CmdGetStatus);
+    writeCommand(m_socket.data(), ApiServer::CmdGetStatus);
 
     processEventsFromLittle();
     processEventsFromLittle();
 
-    result = readResult(m_socket);
-    QVERIFY(result == ApiServer::CmdResultStatus_On);
+    result = readResult(m_socket.data());
+    EXPECT_TRUE(result == ApiServer::CmdResultStatus_On);
 
     // Test Backlight DeviceError state:
     m_little->setStatus(Backlight::StatusDeviceError);
-    writeCommand(m_socket, ApiServer::CmdGetStatus);
+    writeCommand(m_socket.data(), ApiServer::CmdGetStatus);
 
     processEventsFromLittle();
     processEventsFromLittle();
 
-    result = readResult(m_socket);
-    QVERIFY(result == ApiServer::CmdResultStatus_DeviceError);
+    result = readResult(m_socket.data());
+    EXPECT_TRUE(result == ApiServer::CmdResultStatus_DeviceError);
 }
 
-void LightpackApiTest::testCase_GetStatusAPI()
+TEST_F(LightpackApiTest, GetStatusAPITest)
 {
     // Test idle state:
-    writeCommand(m_socket, ApiServer::CmdGetStatusAPI);
+    writeCommand(m_socket.data(), ApiServer::CmdGetStatusAPI);
 
-    QByteArray result = readResult(m_socket);
-    QVERIFY(result == ApiServer::CmdResultStatusAPI_Idle);
+    QByteArray result = readResult(m_socket.data());
+    EXPECT_TRUE(result == ApiServer::CmdResultStatusAPI_Idle);
 
     // Test lock and busy state:
     QTcpSocket sockLock;
     sockLock.connectToHost("127.0.0.1", 3636);
-    QVERIFY(checkVersion(&sockLock));
+    EXPECT_TRUE(checkVersion(&sockLock));
 
     writeCommand(&sockLock, ApiServer::CmdLock);
-    QVERIFY(readResult(&sockLock) == ApiServer::CmdResultLock_Success);
-    QVERIFY(m_sockReadLineOk);
+    EXPECT_TRUE(readResult(&sockLock) == ApiServer::CmdResultLock_Success);
+    EXPECT_TRUE(m_sockReadLineOk);
 
-    writeCommand(m_socket, ApiServer::CmdGetStatusAPI);
-    QVERIFY(readResult(m_socket) == ApiServer::CmdResultStatusAPI_Busy);
-    QVERIFY(m_sockReadLineOk);
+    writeCommand(m_socket.data(), ApiServer::CmdGetStatusAPI);
+    EXPECT_TRUE(readResult(m_socket.data()) == ApiServer::CmdResultStatusAPI_Busy);
+    EXPECT_TRUE(m_sockReadLineOk);
 
     // Test unlock and return to idle state
     writeCommand(&sockLock, ApiServer::CmdUnlock);
-    QVERIFY(readResult(&sockLock) == ApiServer::CmdResultUnlock_Success);
-    QVERIFY(m_sockReadLineOk);
+    EXPECT_TRUE(readResult(&sockLock) == ApiServer::CmdResultUnlock_Success);
+    EXPECT_TRUE(m_sockReadLineOk);
 
-    writeCommand(m_socket, ApiServer::CmdGetStatusAPI);
-    QVERIFY(readResult(m_socket) == ApiServer::CmdResultStatusAPI_Idle);
-    QVERIFY(m_sockReadLineOk);
+    writeCommand(m_socket.data(), ApiServer::CmdGetStatusAPI);
+    EXPECT_TRUE(readResult(m_socket.data()) == ApiServer::CmdResultStatusAPI_Idle);
+    EXPECT_TRUE(m_sockReadLineOk);
 }
 
+/*
 void LightpackApiTest::testCase_GetProfiles()
 {
     QString cmdProfilesCheckResult = getProfilesResultString();
@@ -696,6 +740,7 @@ void LightpackApiTest::testCase_ApiAuthorization()
     // Try lock device after FAIL authorization
     QVERIFY(writeCommandWithCheck(m_socket, ApiServer::CmdLock, ApiServer::CmdApiCheck_AuthRequired));
 }
+//*/
 
 // Private help functions
 

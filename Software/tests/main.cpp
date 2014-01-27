@@ -1,12 +1,12 @@
-
-#include <QtTest/QtTest>
-#include "LightpackApiTest.hpp"
-#include "GrabCalculationTest.hpp"
-#include "lightpackmathtest.hpp"
-#include "HooksTest.h"
 #include <iostream>
+#include <QApplication>
+#include "gtest/gtest.h"
 
 using namespace std;
+
+#if 0
+#include <QtTest/QtTest>
+#include "LightpackApiTest.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
 
     tests.append(new GrabCalculationTest());
     tests.append(new HooksTest());
-    tests.append(new LightpackMathTest());
     tests.append(new LightpackApiTest());
 
 
@@ -35,4 +34,14 @@ int main(int argc, char *argv[])
         cout << endl << summary.at(i).toLocal8Bit().constData() << endl;
 
     return 0;
+}
+#endif
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    cout << "Run LightPack tests:" << endl;
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
