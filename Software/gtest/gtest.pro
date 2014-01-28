@@ -8,7 +8,7 @@ CONFIG(gcc) {
     QMAKE_CXXFLAGS += -isystem $${PWD}/include
     QMAKE_CXXFLAGS += -g -Wall -Wextra -pthread
 } else {
-    INCLUDEPATH += ./include
+    INCLUDEPATH += ./ ./include
 }
 
 # All Google Test headers.  Usually you shouldn't change this
