@@ -46,6 +46,14 @@ using namespace SettingsScope;
 
 #define VERSION_API_TESTS   "1.4"
 
+namespace {
+inline bool checkApiVersion(const QString& apiVersion)
+{
+    static const QString versionTests = "Lightpack API v" VERSION_API_TESTS " (type \"help\" for more info)";
+    return (apiVersion.trimmed() == versionTests);
+}
+}
+
 // get
 // getstatus - on off
 // getstatusapi - busy idle
@@ -87,6 +95,7 @@ protected:
 
     QScopedPointer<QTcpSocket> m_socket;
     bool m_sockReadLineOk;
+    QByteArray m_apiVersion;
 };
 
 void LightpackApiTest::SetUp()
@@ -116,7 +125,7 @@ void LightpackApiTest::SetUp()
     QObject::connect(m_little.data(), SIGNAL(updateApiPort(int)), m_apiServer.data(), SLOT(updateApiPort(int)), Qt::DirectConnection);
 
     QObject::connect(m_interfaceApi.data(), SIGNAL(requestBacklightStatus()), m_little.data(), SLOT(requestBacklightStatus()), Qt::QueuedConnection);
-    QObject::connect(m_little.data(), SIGNAL(resultBacklightStatus(Backlight::Status)), m_interfaceApi.data(), SLOT(resultBacklightStatus(Backlight::Status)), Qt::DirectConnection);
+    QObject::connect(m_little.data(), SIGNAL(resultBacklightStatus(Backlight::Status)), m_interfaceApi.data(), SLOT(resultBacklightStatus(Backlight::Status)));
 
     QObject::connect(m_interfaceApi.data(), SIGNAL(updateLedsColors(QList<QRgb>)), m_little.data(), SLOT(setLedColors(QList<QRgb>)), Qt::QueuedConnection);
     QObject::connect(m_interfaceApi.data(), SIGNAL(updateGamma(double)), m_little.data(), SLOT(setGamma(double)), Qt::QueuedConnection);
@@ -136,6 +145,7 @@ void LightpackApiTest::SetUp()
     EXPECT_TRUE(m_socket->waitForConnected(5000));
 
     m_sockReadLineOk = false;
+    checkVersion(m_socket.data());
 }
 
 void LightpackApiTest::TearDown()
@@ -147,7 +157,16 @@ void LightpackApiTest::TearDown()
 
     QMetaObject::invokeMethod(m_apiServer.data(), "stopWork", Qt::QueuedConnection);
     //m_apiServer->stopWork();
-    m_apiServer.reset();
+
+    QTime shutdownTime;
+    shutdownTime.restart();
+    while (m_apiServer->isWorking())
+    {
+        QThread::sleep(1);
+
+        ASSERT_LT(shutdownTime.elapsed(), 5000);
+    }
+    //m_apiServer.reset();
     m_apiServerThread->exit();
 }
 
@@ -157,7 +176,8 @@ void LightpackApiTest::TearDown()
 TEST_F(LightpackApiTest, ApiVersionTest)
 {
     // Check version of API and version of API Tests on match
-    EXPECT_TRUE(checkVersion(m_socket.data()));
+    QString apiVersion(m_apiVersion);
+    EXPECT_TRUE(checkApiVersion(apiVersion)) << apiVersion.constData();
 }
 
 TEST_F(LightpackApiTest, GetStatusTest)
@@ -169,7 +189,7 @@ TEST_F(LightpackApiTest, GetStatusTest)
     processEventsFromLittle();
 
     QByteArray result = readResult(m_socket.data());
-    EXPECT_TRUE(result == ApiServer::CmdResultStatus_Off);
+    EXPECT_EQ(result, ApiServer::CmdResultStatus_Off);
 
     // Test Backlight On state:
     m_little->setStatus(Backlight::StatusOn);
@@ -179,7 +199,7 @@ TEST_F(LightpackApiTest, GetStatusTest)
     processEventsFromLittle();
 
     result = readResult(m_socket.data());
-    EXPECT_TRUE(result == ApiServer::CmdResultStatus_On);
+    EXPECT_EQ(result, ApiServer::CmdResultStatus_On);
 
     // Test Backlight DeviceError state:
     m_little->setStatus(Backlight::StatusDeviceError);
@@ -189,7 +209,7 @@ TEST_F(LightpackApiTest, GetStatusTest)
     processEventsFromLittle();
 
     result = readResult(m_socket.data());
-    EXPECT_TRUE(result == ApiServer::CmdResultStatus_DeviceError);
+    EXPECT_EQ(result, ApiServer::CmdResultStatus_DeviceError);
 }
 
 TEST_F(LightpackApiTest, GetStatusAPITest)
@@ -198,7 +218,7 @@ TEST_F(LightpackApiTest, GetStatusAPITest)
     writeCommand(m_socket.data(), ApiServer::CmdGetStatusAPI);
 
     QByteArray result = readResult(m_socket.data());
-    EXPECT_TRUE(result == ApiServer::CmdResultStatusAPI_Idle);
+    EXPECT_EQ(result, ApiServer::CmdResultStatusAPI_Idle);
 
     // Test lock and busy state:
     QTcpSocket sockLock;
@@ -206,57 +226,57 @@ TEST_F(LightpackApiTest, GetStatusAPITest)
     EXPECT_TRUE(checkVersion(&sockLock));
 
     writeCommand(&sockLock, ApiServer::CmdLock);
-    EXPECT_TRUE(readResult(&sockLock) == ApiServer::CmdResultLock_Success);
+    EXPECT_EQ(readResult(&sockLock), ApiServer::CmdResultLock_Success);
     EXPECT_TRUE(m_sockReadLineOk);
 
     writeCommand(m_socket.data(), ApiServer::CmdGetStatusAPI);
-    EXPECT_TRUE(readResult(m_socket.data()) == ApiServer::CmdResultStatusAPI_Busy);
+    EXPECT_EQ(readResult(m_socket.data()), ApiServer::CmdResultStatusAPI_Busy);
     EXPECT_TRUE(m_sockReadLineOk);
 
     // Test unlock and return to idle state
     writeCommand(&sockLock, ApiServer::CmdUnlock);
-    EXPECT_TRUE(readResult(&sockLock) == ApiServer::CmdResultUnlock_Success);
+    EXPECT_EQ(readResult(&sockLock), ApiServer::CmdResultUnlock_Success);
     EXPECT_TRUE(m_sockReadLineOk);
 
     writeCommand(m_socket.data(), ApiServer::CmdGetStatusAPI);
-    EXPECT_TRUE(readResult(m_socket.data()) == ApiServer::CmdResultStatusAPI_Idle);
+    EXPECT_EQ(readResult(m_socket.data()), ApiServer::CmdResultStatusAPI_Idle);
     EXPECT_TRUE(m_sockReadLineOk);
 }
 
-/*
-void LightpackApiTest::testCase_GetProfiles()
+TEST_F(LightpackApiTest, GetProfilesTest)
 {
     QString cmdProfilesCheckResult = getProfilesResultString();
 
     // Test GetProfiles command:
 
-    writeCommand(m_socket, ApiServer::CmdGetProfiles);
+    writeCommand(m_socket.data(), ApiServer::CmdGetProfiles);
 
-    QByteArray result = readResult(m_socket).trimmed();
-    QVERIFY(m_sockReadLineOk);
+    QByteArray result = readResult(m_socket.data()).trimmed();
+    EXPECT_TRUE(m_sockReadLineOk);
 
     qDebug() << "res=" << result;
     qDebug() << "check=" << cmdProfilesCheckResult;
 
-    QVERIFY(result == cmdProfilesCheckResult);
+    EXPECT_EQ(QString(result), cmdProfilesCheckResult);
 
     // Test UTF-8 in profile name
 
-    QString utf8Check = trUtf8("\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430"); // Russian word "Proverka"
+    QString utf8Check = QObject::trUtf8("\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430"); // Russian word "Proverka"
 
     Settings::loadOrCreateProfile("ApiTestProfile");
     Settings::loadOrCreateProfile("ApiTestProfile-UTF-8-" + utf8Check);
 
     QString cmdProfilesCheckResultWithUtf8 = getProfilesResultString();
 
-    writeCommand(m_socket, ApiServer::CmdGetProfiles);
+    writeCommand(m_socket.data(), ApiServer::CmdGetProfiles);
 
-    result = readResult(m_socket).trimmed();
-    QVERIFY(m_sockReadLineOk);
+    result = readResult(m_socket.data()).trimmed();
+    EXPECT_TRUE(m_sockReadLineOk);
 
-    QVERIFY(result == cmdProfilesCheckResultWithUtf8);
+    EXPECT_EQ(QString(result), cmdProfilesCheckResultWithUtf8);
 }
 
+/*
 void LightpackApiTest::testCase_GetProfile()
 {
     QString cmdProfileCheckResult = ApiServer::CmdResultProfile +
@@ -791,11 +811,9 @@ bool LightpackApiTest::checkVersion(QTcpSocket * socket)
 {
     // Check the version of the API and API Tests on match
 
-    QString result = readResult(socket);
+    m_apiVersion = readResult(socket);
 
-    QString versionTests = "Lightpack API v" VERSION_API_TESTS " (type \"help\" for more info)";
-
-    return (m_sockReadLineOk && result.trimmed() == versionTests);
+    return (m_sockReadLineOk && checkApiVersion(QString(m_apiVersion)));
 }
 
 bool LightpackApiTest::lock(QTcpSocket * socket)

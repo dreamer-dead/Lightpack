@@ -60,9 +60,10 @@ public:
 
     void setInterface(LightpackPluginInterface *lightpackInterface);
     void firstStart();
+    bool isWorking() const { return m_isWorking; }
 
 public:
-    static const char * ApiVersion;   
+    static const char * ApiVersion;
     static const char * CmdUnknown;
     static const char * CmdExit;
     static const char * CmdHelp;
@@ -216,4 +217,5 @@ private:
 
     QString m_helpMessage;
     QString m_shortHelpMessage;
+    bool m_isWorking;
 };

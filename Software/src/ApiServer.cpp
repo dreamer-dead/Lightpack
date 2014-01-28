@@ -254,6 +254,7 @@ void ApiServer::incomingConnection(int socketDescriptor)
 
     connect(client, SIGNAL(readyRead()), this, SLOT(clientProcessCommands()));
     connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+    m_isWorking = true;
 }
 
 void ApiServer::clientDisconnected()
@@ -1070,6 +1071,7 @@ void ApiServer::taskSetColorIsSuccess(bool isSuccess)
 
 void ApiServer::initPrivateVariables()
 {
+    m_isWorking = false;
     m_apiPort = Settings::getApiPort();
     m_apiAuthKey = Settings::getApiAuthKey();
     m_isAuthEnabled = Settings::isApiAuthEnabled();
@@ -1109,6 +1111,10 @@ void ApiServer::startListening()
 
         emit errorOnStartListening(errorStr);
     }
+    else
+    {
+        m_isWorking = true;
+    } 
 }
 
 void ApiServer::stopListening()
@@ -1135,6 +1141,7 @@ void ApiServer::stopListening()
     }
 
     m_clients.clear();
+    m_isWorking = false;
 }
 
 void ApiServer::writeData(QTcpSocket* client, const QString & data)
