@@ -24,6 +24,7 @@ RCC_DIR     = stuff
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 LIBS += -L../lib -lprismatik-math -lgrab -lgtest
+CONFIG(win32):LIBS+=-ladvapi32
 
 INCLUDEPATH += ../src/ ../src/grab ../hooks ../grab/include ../math/include ../gtest/include
 SOURCES += \
@@ -34,14 +35,14 @@ SOURCES += \
     ../src/Plugin.cpp \
     ../src/LightpackPluginInterface.cpp \
     SettingsWindowMockup.cpp \
-    main.cpp \
     GrabCalculationTest.cpp \
     lightpackmathtest.cpp \
     HooksTest.cpp \
     ../hooks/ProxyFuncJmp.cpp \
     ../hooks/hooksutils.cpp \
     ../hooks/ProxyFuncVFTable.cpp \
-    ../hooks/Logger.cpp
+    ../hooks/Logger.cpp \
+    TestsMain.cpp
 
 HEADERS += \
     ../src/grab/include/calculations.hpp \
@@ -60,3 +61,5 @@ HEADERS += \
     ../hooks/hooksutils.h \
     ../hooks/ProxyFuncVFTable.hpp \
     ../hooks/Logger.hpp
+
+include(../src/qtsingleapplication/src/qtsingleapplication.pri)

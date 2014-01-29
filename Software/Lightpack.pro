@@ -33,7 +33,6 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS = math grab \
-    gtest_test \
     gtest
 
 unix:!macx {
@@ -41,5 +40,4 @@ unix:!macx {
 }
 
 win32:SUBDIRS += libraryinjector hooks tests
-#win32:SUBDIRS += libraryinjector hooks
 SUBDIRS += src

@@ -60,7 +60,6 @@ public:
 
     void setInterface(LightpackPluginInterface *lightpackInterface);
     void firstStart();
-    bool isWorking() const { return m_isWorking; }
 
 public:
     static const char * ApiVersion;
@@ -170,6 +169,7 @@ signals:
     void errorOnStartListening(QString errorMessage);
     void clearColorBuffers();
     void updateApiDeviceNumberOfLeds(int value);
+    void finished();
 
 public slots:
     void enableApiServer(bool isEnabled);
@@ -178,9 +178,6 @@ public slots:
 
 protected:
     void incomingConnection(int socketDescriptor);
-
-public slots:
-    void stopWork();
 
 private slots:
     void clientDisconnected();
@@ -217,5 +214,4 @@ private:
 
     QString m_helpMessage;
     QString m_shortHelpMessage;
-    bool m_isWorking;
 };
