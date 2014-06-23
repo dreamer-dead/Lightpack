@@ -52,6 +52,10 @@ RC_FILE      = ../res/Lightpack.rc
 
 include(../build-config.prf)
 
+# Grabber types configuration
+include(configure-grabbers.prf)
+DEFINES += $${SUPPORTED_GRABBERS}
+
 LIBS    += -L../lib -lgrab -lprismatik-math
 
 unix:!macx{

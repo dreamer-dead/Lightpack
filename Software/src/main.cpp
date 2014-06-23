@@ -198,7 +198,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &ctx, const QString
 int main(int argc, char **argv)
 {
 
-#ifdef Q_OS_MACX
+#if defined Q_OS_MACX && 0
     id activity;
     SInt32 version = 0;
     Gestalt( gestaltSystemVersion, &version );
@@ -246,7 +246,7 @@ int main(int argc, char **argv)
 
     int returnCode = lightpackApp.exec();
 
-#ifdef Q_OS_MACX
+#if defined Q_OS_MACX && 0
     if (endActivityRequired)
       [[NSProcessInfo processInfo] endActivity: activity];
 #endif
